@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:quiz/Question.dart';
+import 'package:quiz/QuizBrain.dart';
+
+QuizBrain quizBrain = QuizBrain();
 
 void main() => runApp(Quizzler());
 
@@ -26,14 +28,16 @@ class QuizPage extends StatefulWidget {
 }
 
 class _QuizPageState extends State<QuizPage> {
-  List<Widget> scoreKeeper = [];
-  List<Question> questionBank = [
-    Question('You can lead a cow down stairs but not up stairs.', false),
-    Question('Approximately one quarter of human bones are in the feet.', true),
-    Question("A slug's blood is green.", true)
-  ];
+  List<Icon> scoreKeeper = [];
 
-  int questionNumber = 0;
+  void checkAnswer(bool userAnswer) {
+    setState(() {
+      userAnswer == quizBrain.getQuestionAnswer()
+          ? scoreKeeper.add(Icon(Icons.check, color: Colors.green))
+          : scoreKeeper.add(Icon(Icons.close, color: Colors.red));
+      quizBrain.nextQuestion();
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -47,7 +51,7 @@ class _QuizPageState extends State<QuizPage> {
             padding: EdgeInsets.all(10.0),
             child: Center(
               child: Text(
-                questionBank[questionNumber].questionText,
+                quizBrain.getQuestionText(),
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   fontSize: 25.0,
@@ -70,10 +74,7 @@ class _QuizPageState extends State<QuizPage> {
                   fontSize: 20.0,
                 ),
               ),
-              onPressed: () => setState(() {
-                if (questionBank[questionNumber].questionAnswer == true) {}
-                questionNumber++;
-              }),
+              onPressed: () => {checkAnswer(true)},
             ),
           ),
         ),
@@ -89,10 +90,7 @@ class _QuizPageState extends State<QuizPage> {
                   color: Colors.white,
                 ),
               ),
-              onPressed: () => setState(() {
-                if (questionBank[questionNumber].questionAnswer == false) {}
-                questionNumber++;
-              }),
+              onPressed: () => checkAnswer(false),
             ),
           ),
         ),
